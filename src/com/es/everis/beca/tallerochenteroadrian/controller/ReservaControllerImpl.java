@@ -1,0 +1,146 @@
+package com.es.everis.beca.tallerochenteroadrian.controller;
+
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.es.everis.beca.tallerochenteroadrian.TallerOchentero;
+import com.es.everis.beca.tallerochenteroadrian.modelo.Persona;
+
+/**
+ * Clase que tiene la lÃ³gica de las reservas.
+ */
+public abstract class ReservaControllerImpl implements ReservaController {
+
+  private TallerOchentero taller = TallerOchentero.getInstance();
+
+  /**
+   * Devuelve true si hay alguna mesa libre.
+   *
+   * @return the boolean
+   */
+  @Override public boolean hayMesasLibres() {
+    boolean resultado = false;
+    for (Mesa mesa : TallerOchentero.getMesas()) {
+      if (!mesa.isReservada()) {
+        resultado = true;
+      }
+    }
+    return resultado;
+  }
+
+  /**
+   * Reservar mesa.
+   *
+   * @param mesaAReservar la mesa a reservar
+   * @param persona       la persona
+   * @param numComnesales el numero comnesales
+   * @return la mesa
+   */
+  @Override public Mesa reservar(Mesa mesaAReservar, Persona persona, int numComnesales) {
+    for (Mesa mesa : restaurante.getMesas()) {
+      if (mesaAReservar.getId().intValue() == mesa.getId().intValue()) {
+        mesa.setCliente(persona);
+        mesa.setComensales(numComnesales);
+        mesa.setReservada(true);
+        return mesa;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Listar reservas.
+   *
+   * @param printer la salida
+   */
+  @Override public void listarReservas(PrintStream printer) {
+    int c = 0;
+    for (Mesa mesa : restaurante.getMesas()) {
+      if (!mesa.isReservada()) {
+        c++;
+      }
+    }
+
+    printer.println("Hay " + c + " reservas.");
+
+    if (c > 0) {
+      for (Mesa mesa : restaurante.getMesas()) {
+        if (!mesa.isReservada()) {
+          printer.println(mesa.getReservaDesc());
+        }
+      }
+    }
+  }
+
+  /**
+   * Deveulve las mesas reservadas al estilo Java8
+   *
+   * @return lista de mesas reservadas
+   */
+  @Override public List<Mesa> getReservas() {
+    return getReservasJava8();
+  }
+
+  private List<Mesa> getReservasJava8() {
+    return restaurante.getMesas().stream()
+        .filter(mesa -> mesa.isReservada())
+        .collect(Collectors.toList());
+  }
+
+  private List<Mesa> getReservasJava7() {
+    List<Mesa> mesasReservadas = new ArrayList<>();
+    for (Mesa mesa : restaurante.getMesas()) {
+      if (!mesa.isReservada()) {
+        mesasReservadas.add(mesa);
+      }
+    }
+    return mesasReservadas;
+  }
+
+  /**
+   * Devuelve las mesas disponibles.
+   *
+   * @return lista de mesas disponibles
+   */
+  @Override public List<Mesa> getMesasDisponibles() {
+    return restaurante.getMesas().stream()
+        .filter(mesa -> mesa.isLibre() && !mesa.isReservada())
+        .collect(Collectors.toList());
+  }
+
+  @Override public Mesa getMesaById(Integer id) {
+    return null;
+  }
+
+@Override
+public void atenderReserva(Integer idMesa) {
+	  //iteramos las mesas
+	  for (Mesa mesasReservada : this.getReservas() ) {
+		  	
+		  //Cuando sea la mesa igual que la que obtenemos de mesa reservadas y esta libre la cambiamos a false
+		  if (idMesa == mesasReservada.getId() && mesasReservada.isLibre() ) {
+			  //Seteamos a false el is libre
+			  mesasReservada.setLibre(false);
+			  System.out.println("Es correcta, entre a su mesa señor " + mesasReservada.getCliente());
+		}
+		
+	}
+	  
+	
+}
+
+@Override
+public Mesa reservar(Mesa mesaAReservar, Persona persona, int numComnesales) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Mesa getMesaById(Integer id) {
+	// TODO Auto-generated method stub
+	return null;
+}
+}
